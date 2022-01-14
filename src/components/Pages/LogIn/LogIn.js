@@ -50,6 +50,10 @@ const LogIn = () => {
             console.log(data.idToken);
 
             context.logIn(data.idToken);
+            console.log("Unique UserId : ",data.localId);
+            context.setUserId(data.localId);
+            
+
             navigate('/showTask')
             console.log(context.token);
         })

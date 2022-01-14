@@ -3,14 +3,6 @@ import { Card, Button } from 'react-bootstrap'
 // import AddTaskContext from "./contextStore/AddTaskContext";
 import AddTaskContext from "./contextStore/AddTaskContext";
 const AddTaskLiveOutPut = (props) => {
-    // AddTaskFormData
-    /*const taskDetails={
-        title:'',
-        specialInfo:'',
-        taskDetails:''
-
-    } */
-    // const addTaskContext=useContext(AddTaskContext);
  const context =useContext(AddTaskContext);
 
     return (

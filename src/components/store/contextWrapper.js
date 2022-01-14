@@ -5,6 +5,12 @@ import AuthContext from "./context";
 const AuthContextProvider=(props)=>{
     
     const [token,setToken]=useState(null);
+    const [userId,setUserId]=useState(null);
+
+    const updateUserId=(userId)=>{
+        setUserId(userId)
+
+    }
 
     const isLoggedIn=!!token;
 
@@ -19,6 +25,8 @@ const AuthContextProvider=(props)=>{
     }
     const contextValues={
         token:token,
+        userId:userId,
+        setUserId:updateUserId,
         isLoggedIn:isLoggedIn,
         logIn:loginHandeler,
         logOut:logoutHAndeler
