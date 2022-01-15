@@ -6,7 +6,7 @@ import AuthContext from '../../store/context';
 
 // //////////////////////////firebase imports /////////////////////////
 import { initializeApp } from 'firebase/app';
-import {getFirestore,doc,setDoc,collection,addDoc} from 'firebase/firestore'
+import {getFirestore,doc,setDoc,collection,addDoc,getDoc} from 'firebase/firestore'
 
 
 const AddTaskForm = ( props) => {
@@ -30,27 +30,133 @@ const AddTaskForm = ( props) => {
       const firestore=getFirestore()
 
 
-      const addData=()=>{
-           const userId=AuthCtx.userId;
-           const docData=
-           {
-               title:context.title,
-               specialInfo:context.specialInfo,
-               details:context.details
-           }
-        //    const docReference =doc(firestore,`${userId}/task1`)
-           const docReference =doc(firestore,userId,'task') 
-           setDoc(docReference,docData)
-        //    addDoc(docReference,docData)
+      const addData= async ()=>{
+      
+       
+        const userId=AuthCtx.userId;
+        const date =new Date () ;
+        const path=`${date.getDate()}|${date.getMonth()+1}|${date.getFullYear()}`;
+        const reference=doc(firestore,userId,path)
+        const  mySnapShot= await  getDoc(reference)
+
+        if (mySnapShot.exists()) {
+            alert("Data Exsist ")
+          
+
+            
+            const currentTask=
+            {
+                title:context.title,
+                specialInfo:context.specialInfo,
+                details:context.details
+            }
+            const DocData= await mySnapShot.data();
+            const arrray =DocData.allTasks;
+
+            console.log('====================================');
+            console.log("DocData :: ",arrray);
+            console.log("length  :: ",arrray.length);
+            arrray.push(currentTask);
+            console.log("After adding  :: ",arrray);
+            const structure={
+                allTasks:arrray
+            }
+            setDoc(reference,structure);
+
+            
+
+            console.log('====================================');
+         
 
 
+            
+        }
+        else{
+            alert("Data  Not Exsist ")
+        const Structure={allTasks:[]}
+            
+
+            const userId=AuthCtx.userId;
+            const currentTask=
+            {
+                title:context.title,
+                specialInfo:context.specialInfo,
+                details:context.details
+            }
+            Structure.allTasks.push(currentTask);
+
+            setDoc(reference,Structure)
 
 
+            
+        }
 
-
-
+        
       
       }
+     /** const updateData= async  ()=>{
+          alert ("Update called ")
+
+        const userId=AuthCtx.userId;
+        const date =new Date () ;
+        const path=`${date.getDate()}|${date.getMonth()+1}|${date.getFullYear()}`;
+        const reference=doc(firestore,userId,path)
+        const  mySnapShot=await  getDoc(reference)
+
+        if (mySnapShot.exists()) {
+            alert("Data Exsist ")
+            console.log("Data Exsist : ");
+
+            
+            const currentTask=
+            {
+                title:context.title,
+                specialInfo:context.specialInfo,
+                details:context.details
+            }
+            const DocData=mySnapShot.data();
+            console.log('====================================');
+            console.log("DocData :: ",DocData.allTasks);
+            console.log('====================================');
+         
+
+
+
+
+          
+            // const allTask=DocData.allTask;
+            // allTask.push(currentTask)
+            // const Structure={
+            //     allTask:allTask
+            // }
+            // setDoc(reference,Structure)
+
+            
+        }
+        else{
+            alert("Data  Not Exsist ")
+        const Structure={allTasks:[]}
+            
+
+            const userId=AuthCtx.userId;
+            const currentTask=
+            {
+                title:context.title,
+                specialInfo:context.specialInfo,
+                details:context.details
+            }
+            Structure.allTasks.push(currentTask);
+
+            setDoc(reference,Structure)
+
+
+            
+        }
+
+        
+
+
+      } */
 ///////////////////////////firebase setup end //////////////////////////////
  
  

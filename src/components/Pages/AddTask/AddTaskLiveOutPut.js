@@ -3,7 +3,8 @@ import { Card, Button } from 'react-bootstrap'
 // import AddTaskContext from "./contextStore/AddTaskContext";
 import AddTaskContext from "./contextStore/AddTaskContext";
 const AddTaskLiveOutPut = (props) => {
- const context =useContext(AddTaskContext);
+
+    const context =useContext(AddTaskContext);
 
     return (
         <div>
@@ -17,7 +18,7 @@ const AddTaskLiveOutPut = (props) => {
                         <Card.Title style={{ fontSize: '25px' }}>
                             {context.specialInfo}
                         </Card.Title>
-                        <Card.Title style={{ fontSize: '25px' }}>
+                        <Card.Title style={{ fontSize: '25px', fontWeight: 'lighter' ,marginTop:'50px'}}>
                             {context.details}
 
                         </Card.Title>
