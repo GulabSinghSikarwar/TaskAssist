@@ -1,6 +1,12 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Card, Button } from 'react-bootstrap'
+import './cardDisplay.css'
 
+//////////////////////////////// Component Imports ////////////////////////////////
+
+import TaskCard from './card';
+
+////////////////////////////////  Components Import Over //////////////////////////////// 
 
 ////////////////////////////////firebase imports//////////////////////////////// 
 
@@ -14,18 +20,22 @@ import { getDoc, getFirestore, doc, setDoc, collection, addDoc } from 'firebase/
 
 import AuthContext from '../../store/context';
 
+
+
 ////////////////////////////////  auth Context Over  ////////////////////////////////
 
 
+//////////////////////////////// FireBase Function Start ////////////////////////////////
+
+
 const ShowTask = () => {
+  var i = 0;
+
+  const [task, setTask] = useState([{}])
+  const [recievedDate, setRecievedDate] = useState(false)
+  const [enteredDate, setEnteredDate] = useState(null)
 
 
-
-  const authCtx = useContext(AuthContext)
-  const userId = authCtx.userId;
-  
-  
-  //////////////////////////////// FireBase Function Start ////////////////////////////////
 
   const firebaseConfig = {
     apiKey: "AIzaSyBQjHEHJl48ohXc1t7dTfjKoydcntmWXsY",
@@ -38,44 +48,89 @@ const ShowTask = () => {
   const date = new Date();
   const app = initializeApp(firebaseConfig);
   const firestore = getFirestore()
-  const ShowData = async  () => {
-    const date=new Date();
-           const path=`${date.getDate()}|${date.getMonth()+1}|${date.getFullYear()}`;
-           const docReference=doc(firestore,userId,path)
-
-          //  const docReference=doc(firestore,`${userId}/${path}` )
-
-           console.log( " path Refereence ",`${userId}/${path}`);
-            
 
 
-    const mySnapshot= await getDoc(docReference)
-    console.log(" Exsist : ",mySnapshot.exists());
-    if (mySnapshot.exists()) {
-      console.log(" my data : ",JSON.stringify(mySnapshot));
-      // console.log(mySnapshot.data)
-      const docData=mySnapshot.data();
+  const authCtx = useContext(AuthContext)
+  const userId = authCtx.userId;
 
-      const data=JSON.stringify(docData)
-      console.log("data : ",data);
-      
+  const path = `${date.getDate()}|${date.getMonth() + 1}|${date.getFullYear()}`;
+  const docReference = doc(firestore, userId, path)
+
+
+
+
+
+
+  var allTasks = [{ message: "emp" }];
+
+  const getData = async () => {
+
+
+    const userId = authCtx.userId;
+    const date = new Date();
+    const path = `${date.getDate()}|${date.getMonth() + 1}|${date.getFullYear()}`;
+    const reference = doc(firestore, userId, path)
+    const mySnapShot = await getDoc(reference)
+
+    var array;
+
+    console.log(mySnapShot.exists());
+    var ourArray = []
+    if (mySnapShot.exists()) {
+      const DocData = await mySnapShot.data();
+      array = DocData.allTasks;
+      console.log('====================================');
+      console.log(" doc : ", DocData);
+      console.log(" array  : ", array);
+      ourArray = array;
+      allTasks = array;
+
+
+
+      console.log('====================================');
+
     }
 
-    
-    
+
+
+
+
+    return array;
 
   }
-  useEffect(()=>{
-    ShowData().then(()=>{
-console.log("Succesfully shown ");
-    }).catch((error)=>{
-      console.log( " error : ",error );
-    })
+  const recieveData = () => {
 
-  },[])
+
+
+    const data = getData().then((value) => {
+      setTask(value)
+      console.log('====================================');
+      console.log(" inside promise : value of set task ", value);
+      console.log('====================================');
+    }).catch((e) => {
+      console.log('====================================');
+      console.log(" error : ", e);
+      console.log('====================================');
+    });
+
+
+
+  }
+  useEffect(() => {
+
+    var value = recieveData();
+
+  }, [])
 
   //////////////////////////////// FireBase Function Over ////////////////////////////////
+  const firstTouched = true;
 
+  const CalendarValueHandeler = (event) => {
+    setRecievedDate(true);
+    setEnteredDate(event.target.value)
+    console.log(" ENtered Date : ", event.target.value);
+    console.log(event.target.value);
+  }
 
 
 
@@ -83,36 +138,26 @@ console.log("Succesfully shown ");
   return (
     <div>
       <h1> this is show task page</h1>
-
-      <div >
-        <div style={{ width: '450px', alignContent: 'center', margin: 'auto' }}>
-          <Card className="text-center">
-            <Card.Header style={{ textTransform: 'uppercase', fontSize: '28px' }}>
-              title
-            </Card.Header>
-            <Card.Body>
-
-              <Card.Title style={{ fontSize: '25px' }}>
-                specialInfo
-              </Card.Title>
-              <Card.Title style={{ fontSize: '25px', fontWeight: 'lighter', marginTop: '50px' }}>
-                details
-
-              </Card.Title>
-
-
-
-            </Card.Body>
-            <Card.Footer className="text-muted">
-              <Button variant="primary">
-                Go somewhere
-              </Button>
-            </Card.Footer>
-          </Card>
-        </div>
+      <div>
+        <form>
+          <input type={"date"} onChange={CalendarValueHandeler}></input>
+          <Button variant="primary" style={{ fontSize: '15px' }}>
+            Go somewhere
+          </Button>
+        </form>
 
       </div>
+
+      <div className='gridContainer'>
+        {
+          (Array.isArray(task)) ? (task.length === 0) ? "Nod Data " : task.map((currentTask) => {
+            return <TaskCard key={i++} title={currentTask.title} specialInfo={currentTask.specialInfo} details={currentTask.details} />
+          }) : "No Data Exsist "
+        }
+      </div>
+
     </div>
   )
 }
 export default ShowTask
+

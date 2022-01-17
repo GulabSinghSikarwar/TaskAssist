@@ -51,7 +51,7 @@ const AddTaskForm = ( props) => {
                 details:context.details
             }
             const DocData= await mySnapShot.data();
-            const arrray =DocData.allTasks;
+            var arrray =DocData.allTasks;
 
             console.log('====================================');
             console.log("DocData :: ",arrray);
