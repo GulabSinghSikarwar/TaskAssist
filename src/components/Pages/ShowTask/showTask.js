@@ -118,18 +118,47 @@ const ShowTask = () => {
   }
   useEffect(() => {
 
-    var value = recieveData();
+   if (recievedDate) {
+    recieveData();
+   } 
 
-  }, [])
+  }, [recievedDate])
 
   //////////////////////////////// FireBase Function Over ////////////////////////////////
   const firstTouched = true;
 
   const CalendarValueHandeler = (event) => {
+
+    
     setRecievedDate(true);
-    setEnteredDate(event.target.value)
+    // setEnteredDate(event.target.value)
     console.log(" ENtered Date : ", event.target.value);
-    console.log(event.target.value);
+    
+    var getDate=event.target.value;
+    
+    console.log('====================================');
+   console.log(" year: ", getDate.substring(0,4)
+   ," month: " , getDate.substring(5,7)," date : "
+   , getDate.substring(8,10)
+   
+   );
+  //   2022-01-20
+  var date=parseInt(getDate.substring(8,10));
+  var month=parseInt(   getDate.substring(5,7) );
+  var year =parseInt(getDate.substring(0,4)   )
+  let OurDate=
+  {
+    date:date,
+    month:month,
+    year:year
+  }
+  setEnteredDate(OurDate);
+  console.log('====================================');
+  console.log(OurDate);
+  console.log('====================================');
+  
+    console.log('====================================');
+
   }
 
 
@@ -141,14 +170,14 @@ const ShowTask = () => {
       <div>
         <form>
           <input type={"date"} onChange={CalendarValueHandeler}></input>
-          <Button variant="primary" style={{ fontSize: '15px' }}>
+          {/* <Button variant="primary" style={{ fontSize: '15px' }}>
             Go somewhere
-          </Button>
+          </Button> */}
         </form>
 
       </div>
 
-      <div className='gridContainer'>
+      <div className='gridContainer' style={{display:(recievedDate)?"grid":"none"}}>
         {
           (Array.isArray(task)) ? (task.length === 0) ? "Nod Data " : task.map((currentTask) => {
             return <TaskCard key={i++} title={currentTask.title} specialInfo={currentTask.specialInfo} details={currentTask.details} />
