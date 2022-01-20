@@ -31,9 +31,11 @@ import AuthContext from '../../store/context';
 const ShowTask = () => {
   var i = 0;
 
-  const [task, setTask] = useState([{}])
+  const [task, setTask] = useState([])
   const [recievedDate, setRecievedDate] = useState(false)
-  const [enteredDate, setEnteredDate] = useState(null)
+  const [enteredDate, setEnteredDate] = useState({ date: 0,
+    month: 0,
+    year: 0})
 
 
 
@@ -53,7 +55,7 @@ const ShowTask = () => {
   const authCtx = useContext(AuthContext)
   const userId = authCtx.userId;
 
-  const path = `${date.getDate()}|${date.getMonth() + 1}|${date.getFullYear()}`;
+  const path = `${enteredDate.date}|${enteredDate.month}|${enteredDate.year}`;
   const docReference = doc(firestore, userId, path)
 
 
@@ -63,12 +65,21 @@ const ShowTask = () => {
 
   var allTasks = [{ message: "emp" }];
 
-  const getData = async () => {
+
+
+
+
+
+  const getData = async (date) => {
 
 
     const userId = authCtx.userId;
-    const date = new Date();
-    const path = `${date.getDate()}|${date.getMonth() + 1}|${date.getFullYear()}`;
+    // const date = new Date();
+   
+  const path = `${date.date}|${date.month}|${date.year}`;
+    console.log('====================================');
+    console.log(" path : ",path);
+    console.log('====================================');
     const reference = doc(firestore, userId, path)
     const mySnapShot = await getDoc(reference)
 
@@ -98,11 +109,11 @@ const ShowTask = () => {
     return array;
 
   }
-  const recieveData = () => {
+  const recieveData = (date) => {
 
 
 
-    const data = getData().then((value) => {
+    const data = getData(date).then((value) => {
       setTask(value)
       console.log('====================================');
       console.log(" inside promise : value of set task ", value);
@@ -116,58 +127,66 @@ const ShowTask = () => {
 
 
   }
-  useEffect(() => {
-
-   if (recievedDate) {
-    recieveData();
-   } 
-
-  }, [recievedDate])
+  
 
   //////////////////////////////// FireBase Function Over ////////////////////////////////
   const firstTouched = true;
 
   const CalendarValueHandeler = (event) => {
 
-    
+
     setRecievedDate(true);
     // setEnteredDate(event.target.value)
     console.log(" ENtered Date : ", event.target.value);
-    
-    var getDate=event.target.value;
-    
+
+    var getDate = event.target.value;
+
     console.log('====================================');
-   console.log(" year: ", getDate.substring(0,4)
-   ," month: " , getDate.substring(5,7)," date : "
-   , getDate.substring(8,10)
-   
-   );
-  //   2022-01-20
-  var date=parseInt(getDate.substring(8,10));
-  var month=parseInt(   getDate.substring(5,7) );
-  var year =parseInt(getDate.substring(0,4)   )
-  let OurDate=
-  {
-    date:date,
-    month:month,
-    year:year
-  }
-  setEnteredDate(OurDate);
-  console.log('====================================');
-  console.log(OurDate);
-  console.log('====================================');
+    console.log(" year: ", getDate.substring(0, 4)
+      , " month: ", getDate.substring(5, 7), " date : "
+      , getDate.substring(8, 10)
+
+    );
+    //   2022-01-20
+    var date = parseInt(getDate.substring(8, 10));
+    var month = parseInt(getDate.substring(5, 7));
+    var year = parseInt(getDate.substring(0, 4))
+    let OurDate =
+    {
+      date: date,
+      month: month,
+      year: year
+    }
+    setEnteredDate(OurDate);
   
-    console.log('====================================');
+    getData(OurDate).then((data)=>{
+      console.log(" inside promise : value of set task ", data);
+      setTask(data.allTasks)
+      getDataCallBack(data.allTasks)
+    })
 
   }
+
+  var ourTasks=[]
+  const getDataCallBack=(array)=>{
+ourTasks=array;
+console.log("late fn call ");
+
+  }
+  useEffect(()=>{
+    if(recievedDate){
+      recieveData(enteredDate)
+    }
+          }, [enteredDate] 
+  )
 
 
 
 
   return (
-    <div>
+    <div className='wrapper'>
       <h1> this is show task page</h1>
-      <div>
+      <div className='formContainer'>
         <form>
           <input type={"date"} onChange={CalendarValueHandeler}></input>
           {/* <Button variant="primary" style={{ fontSize: '15px' }}>
@@ -177,11 +196,12 @@ const ShowTask = () => {
 
       </div>
 
-      <div className='gridContainer' style={{display:(recievedDate)?"grid":"none"}}>
+      <div className='gridContainer' style={{ display: (recievedDate) ? "grid" : "none" }}>
         {
           (Array.isArray(task)) ? (task.length === 0) ? "Nod Data " : task.map((currentTask) => {
             return <TaskCard key={i++} title={currentTask.title} specialInfo={currentTask.specialInfo} details={currentTask.details} />
           }) : "No Data Exsist "
+        
         }
       </div>
 
